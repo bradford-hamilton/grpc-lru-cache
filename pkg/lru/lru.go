@@ -9,7 +9,7 @@ import (
 // ErrMinCacheSize is returned when a caller tries to create a new LRU cache with a size of less than one
 var ErrMinCacheSize = errors.New("please provide an LRU cache size greater than or equal to 1")
 
-// CacheClient represents the interface
+// CacheClient represents the interface that must be implemented in order to
 type CacheClient interface {
 	Set(key, value interface{}) bool
 	Get(key interface{}) (interface{}, bool)
@@ -17,7 +17,7 @@ type CacheClient interface {
 }
 
 // Cache represents our LRU cache and implements the CacheClient interface
-type Cache struct {
+type cache struct {
 	size  int
 	list  *list.List
 	items map[interface{}]*list.Element
@@ -35,7 +35,7 @@ func NewCacheClient(size int) (CacheClient, error) {
 	if size < 1 {
 		return nil, ErrMinCacheSize
 	}
-	return &Cache{
+	return &cache{
 		size:  size,
 		list:  list.New(),
 		items: make(map[interface{}]*list.Element),
@@ -45,7 +45,7 @@ func NewCacheClient(size int) (CacheClient, error) {
 // Get handles finding the key in cache, moving it to the front of our linked list (making it
 // the most recently used item), and returning it. If no key is found it returns nil and false
 // which represents whether the query was "ok"
-func (c *Cache) Get(key interface{}) (interface{}, bool) {
+func (c *cache) Get(key interface{}) (interface{}, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -64,7 +64,7 @@ func (c *Cache) Get(key interface{}) (interface{}, bool) {
 // If the key is already present, move it to the front and make it most recent.
 // If the key is not present, set the key, push it to the front of our list (make it most recent),
 // and evicting the least recently used item if the list length is greater than the cache size.
-func (c *Cache) Set(key, value interface{}) bool {
+func (c *cache) Set(key, value interface{}) bool {
 	c.mu.Lock()
 	if el, ok := c.items[key]; ok {
 		c.mu.Unlock()
@@ -83,7 +83,7 @@ func (c *Cache) Set(key, value interface{}) bool {
 }
 
 // Keys returns a slice of all the current keys available in cache.
-func (c *Cache) Keys() []interface{} {
+func (c *cache) Keys() []interface{} {
 	var i int
 	keys := make([]interface{}, len(c.items))
 	c.mu.Lock()
@@ -97,7 +97,7 @@ func (c *Cache) Keys() []interface{} {
 
 // evictLRUItem looks for the last ("Back") item on our cache's linked list.
 // If it is found, a call to evict that specific element from the list is made.
-func (c *Cache) evictLRUItem() {
+func (c *cache) evictLRUItem() {
 	if el := c.list.Back(); el != nil {
 		c.evictElement(el)
 	}
@@ -105,7 +105,7 @@ func (c *Cache) evictLRUItem() {
 
 // evictElement takes a ptr to a list element and removes it from the list.
 // After removing it from the list, we remove it from our cache's items map.
-func (c *Cache) evictElement(el *list.Element) {
+func (c *cache) evictElement(el *list.Element) {
 	c.list.Remove(el)
 	item := el.Value.(*Item)
 

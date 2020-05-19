@@ -72,7 +72,7 @@ func TestCache_GetAndSet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Cache{
+			c := &cache{
 				size:  tt.fields.size,
 				list:  tt.fields.list,
 				items: tt.fields.items,
