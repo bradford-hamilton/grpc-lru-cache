@@ -2,7 +2,9 @@ package lru
 
 import (
 	"container/list"
+	"fmt"
 	"reflect"
+	"strconv"
 	"sync"
 	"testing"
 )
@@ -89,5 +91,37 @@ func TestCache_GetAndSet(t *testing.T) {
 				t.Errorf("Cache.Get() ok = %v, want %v", ok, tt.ok)
 			}
 		})
+	}
+}
+
+var sink bool
+var item interface{}
+
+func BenchmarkSetItem(b *testing.B) {
+	c, err := NewCacheClient(1000)
+	if err != nil {
+		fmt.Printf("failed to create client: %v\n", err)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ok := c.Set(i, "value#"+strconv.Itoa(i))
+		sink = ok
+	}
+}
+
+func BenchmarkGetItem(b *testing.B) {
+	c, err := NewCacheClient(1000)
+	if err != nil {
+		fmt.Printf("failed to create client: %v\n", err)
+	}
+	for i := 0; i < 1000; i++ {
+		ok := c.Set(i, "value#"+strconv.Itoa(i))
+		sink = ok
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		itm, ok := c.Get("value#" + strconv.Itoa(i))
+		sink = ok
+		item = itm
 	}
 }
