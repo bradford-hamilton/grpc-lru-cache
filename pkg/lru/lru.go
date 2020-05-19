@@ -13,14 +13,15 @@ var ErrMinCacheSize = errors.New("please provide an LRU cache size greater than 
 type CacheClient interface {
 	Set(key, value interface{}) bool
 	Get(key interface{}) (interface{}, bool)
+	Keys() []interface{}
 }
 
-// Cache TODO: docs
+// Cache represents our LRU cache and implements the CacheClient interface
 type Cache struct {
 	size  int
-	list  *list.List // Doubly linked list from container/list, TODO: maybe replace with hand rolled for the tutorial? But also maybe not :)
+	list  *list.List
 	items map[interface{}]*list.Element
-	mux   sync.Mutex
+	mu    sync.Mutex
 }
 
 // Item represents a single item from our LRU cache, which simply has a key and value
@@ -45,8 +46,9 @@ func NewCacheClient(size int) (CacheClient, error) {
 // the most recently used item), and returning it. If no key is found it returns nil and false
 // which represents whether the query was "ok"
 func (c *Cache) Get(key interface{}) (interface{}, bool) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if el, ok := c.items[key]; ok {
 		c.list.MoveToFront(el)
 		if el.Value.(*Item).value == nil {
@@ -54,6 +56,7 @@ func (c *Cache) Get(key interface{}) (interface{}, bool) {
 		}
 		return el.Value.(*Item).value, true
 	}
+
 	return nil, false
 }
 
@@ -62,22 +65,34 @@ func (c *Cache) Get(key interface{}) (interface{}, bool) {
 // If the key is not present, set the key, push it to the front of our list (make it most recent),
 // and evicting the least recently used item if the list length is greater than the cache size.
 func (c *Cache) Set(key, value interface{}) bool {
-	c.mux.Lock()
+	c.mu.Lock()
 	if el, ok := c.items[key]; ok {
-		c.mux.Unlock()
+		c.mu.Unlock()
 		c.list.MoveToFront(el)
 		el.Value.(*Item).value = value
 		return false
 	}
 	c.items[key] = c.list.PushFront(&Item{key, value})
-	c.mux.Unlock()
+	c.mu.Unlock()
 
 	// Check and evict the least recently used item when appropriate
 	if c.list.Len() > c.size {
 		c.evictLRUItem()
 	}
-
 	return true
+}
+
+// Keys returns a slice of all the current keys available in cache.
+func (c *Cache) Keys() []interface{} {
+	var i int
+	keys := make([]interface{}, len(c.items))
+	c.mu.Lock()
+	for _, item := range c.items {
+		keys[i] = item.Value.(*Item).key
+		i++
+	}
+	c.mu.Unlock()
+	return keys
 }
 
 // evictLRUItem looks for the last ("Back") item on our cache's linked list.
@@ -95,7 +110,7 @@ func (c *Cache) evictElement(el *list.Element) {
 	item := el.Value.(*Item)
 
 	// Keep critical sections as small as possible
-	c.mux.Lock()
+	c.mu.Lock()
 	delete(c.items, item.key)
-	c.mux.Unlock()
+	c.mu.Unlock()
 }

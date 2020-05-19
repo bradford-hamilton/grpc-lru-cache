@@ -7,27 +7,38 @@ import (
 )
 
 func main() {
-	cache, err := lru.NewCacheClient(10)
+	c, err := lru.NewCacheClient(10)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	if ok := cache.Set("someKey", "someValue"); ok == false {
+	// Set some keys
+	if ok := c.Set("someKey", "someValue"); ok == false {
+		fmt.Println("didnt add: ", ok)
+	}
+	if ok := c.Set("price", 350000); ok == false {
+		fmt.Println("didnt add: ", ok)
+	}
+	if ok := c.Set(struct{ name string }{"daaaavid"}, 5.5); ok == false {
 		fmt.Println("didnt add: ", ok)
 	}
 
-	item, ok := cache.Get("someKey")
-	if !ok {
-		fmt.Println(err)
+	// Get some keys
+	if item, ok := c.Get("someKey"); ok {
+		fmt.Println(item)
+	}
+	if item, ok := c.Get("price"); ok {
+		fmt.Println(item)
+	}
+	if item, ok := c.Get(struct{ name string }{"daaaavid"}); ok {
+		fmt.Println(item)
+	}
+	if item, ok := c.Get("someKeyThatIsntThere"); ok {
+		fmt.Println(item)
 	}
 
-	item2, ok := cache.Get("someKeyThatIsntThere")
-	if !ok {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("item1: %+v", item)
-	fmt.Printf("item2: %+v", item2)
+	allKeys := c.Keys()
+	fmt.Println(allKeys)
 }
 
 // TODO

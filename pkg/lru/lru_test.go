@@ -12,7 +12,7 @@ func TestCache_GetAndSet(t *testing.T) {
 		size  int
 		list  *list.List
 		items map[interface{}]*list.Element
-		mux   sync.Mutex
+		mu    sync.Mutex
 	}
 	type args struct {
 		Key interface{}
@@ -76,7 +76,7 @@ func TestCache_GetAndSet(t *testing.T) {
 				size:  tt.fields.size,
 				list:  tt.fields.list,
 				items: tt.fields.items,
-				mux:   tt.fields.mux,
+				mu:    tt.fields.mu,
 			}
 			if ok := c.Set(tt.args.Key, tt.want); !ok {
 				t.Errorf("failed to Set() cache with key: %s and value: %s", tt.args.Key, tt.want)
