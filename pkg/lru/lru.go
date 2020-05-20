@@ -14,7 +14,7 @@ type Cache struct {
 	cap   int                           // max number of items the cache can hold before needing to evict.
 	ll    *list.List                    // a doubly linked list.
 	mu    sync.Mutex                    // mutex for concurrent access to the cache
-	items map[interface{}]*list.Element // items mapping of key ->
+	items map[interface{}]*list.Element // map of keys -> doubly linked list elements
 }
 
 // Item represents a single item from our LRU cache, which simply has a key and value
@@ -77,9 +77,11 @@ func (c *Cache) Set(key, value interface{}) bool {
 
 // Flush handles clearing out the items map and re-initializing the cache's list
 func (c *Cache) Flush() {
+	c.mu.Lock()
 	for k := range c.items {
 		delete(c.items, k)
 	}
+	c.mu.Unlock()
 	c.ll.Init()
 }
 

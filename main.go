@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/bradford-hamilton/LRU-cache/pkg/lru"
+	"github.com/bradford-hamilton/lru-cache/pkg/lru"
 )
 
 func main() {
