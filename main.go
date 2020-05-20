@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	c, err := lru.NewCacheClient(10)
+	c, err := lru.NewCache(10)
 	if err != nil {
 		fmt.Println(err)
 	}

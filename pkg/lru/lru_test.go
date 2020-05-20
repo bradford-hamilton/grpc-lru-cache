@@ -11,8 +11,8 @@ import (
 
 func TestCache_GetAndSet(t *testing.T) {
 	type fields struct {
-		size  int
-		list  *list.List
+		cap   int
+		ll    *list.List
 		items map[interface{}]*list.Element
 		mu    sync.Mutex
 	}
@@ -29,8 +29,8 @@ func TestCache_GetAndSet(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				size:  10,
-				list:  list.New(),
+				cap:   10,
+				ll:    list.New(),
 				items: make(map[interface{}]*list.Element),
 			},
 			args: args{Key: "someKey"},
@@ -40,8 +40,8 @@ func TestCache_GetAndSet(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				size:  10,
-				list:  list.New(),
+				cap:   10,
+				ll:    list.New(),
 				items: make(map[interface{}]*list.Element),
 			},
 			args: args{Key: 255},
@@ -51,8 +51,8 @@ func TestCache_GetAndSet(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				size:  10,
-				list:  list.New(),
+				cap:   10,
+				ll:    list.New(),
 				items: make(map[interface{}]*list.Element),
 			},
 			args: args{Key: struct{ name string }{"daaaavid"}},
@@ -62,8 +62,8 @@ func TestCache_GetAndSet(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				size:  10,
-				list:  list.New(),
+				cap:   10,
+				ll:    list.New(),
 				items: make(map[interface{}]*list.Element),
 			},
 			args: args{Key: 0.45},
@@ -74,9 +74,9 @@ func TestCache_GetAndSet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &cache{
-				size:  tt.fields.size,
-				list:  tt.fields.list,
+			c := &Cache{
+				cap:   tt.fields.cap,
+				ll:    tt.fields.ll,
 				items: tt.fields.items,
 				mu:    tt.fields.mu,
 			}
@@ -98,7 +98,7 @@ var sink bool
 var item interface{}
 
 func BenchmarkSetItem(b *testing.B) {
-	c, err := NewCacheClient(1000)
+	c, err := NewCache(1000)
 	if err != nil {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
@@ -110,7 +110,7 @@ func BenchmarkSetItem(b *testing.B) {
 }
 
 func BenchmarkGetItem(b *testing.B) {
-	c, err := NewCacheClient(1000)
+	c, err := NewCache(1000)
 	if err != nil {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
