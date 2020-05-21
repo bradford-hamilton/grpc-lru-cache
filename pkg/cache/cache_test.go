@@ -1,4 +1,4 @@
-package lru
+package cache
 
 import (
 	"container/list"
@@ -75,12 +75,14 @@ func TestCache_GetAndSet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Cache{
-				cap:   tt.fields.cap,
-				ll:    tt.fields.ll,
-				items: tt.fields.items,
-				mu:    tt.fields.mu,
+				lru: &lru{
+					cap:   tt.fields.cap,
+					ll:    tt.fields.ll,
+					items: tt.fields.items,
+				},
+				mu: tt.fields.mu,
 			}
-			if ok := c.Set(tt.args.Key, tt.want); !ok {
+			if _, ok := c.Set(tt.args.Key, tt.want); !ok {
 				t.Errorf("failed to Set() cache with key: %s and value: %s", tt.args.Key, tt.want)
 			}
 			got, ok := c.Get(tt.args.Key)
@@ -98,24 +100,24 @@ var sink bool
 var item interface{}
 
 func BenchmarkSetItem(b *testing.B) {
-	c, err := NewCache(1000)
+	c, err := New(1000)
 	if err != nil {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ok := c.Set(i, "value#"+strconv.Itoa(i))
+		_, ok := c.Set(i, "value#"+strconv.Itoa(i))
 		sink = ok
 	}
 }
 
 func BenchmarkGetItem(b *testing.B) {
-	c, err := NewCache(1000)
+	c, err := New(1000)
 	if err != nil {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
 	for i := 0; i < 1000; i++ {
-		ok := c.Set(i, "value#"+strconv.Itoa(i))
+		_, ok := c.Set(i, "value#"+strconv.Itoa(i))
 		sink = ok
 	}
 	b.ResetTimer()
