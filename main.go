@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	c, err := cache.New(1000)
+	c, err := cache.New(5000)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -42,10 +42,15 @@ func main() {
 	// Print a slice of all available keys (a few from above)
 	fmt.Println(c.Keys())
 
+	// Example of 10,000 go routines reading/writing safely
 	var wg sync.WaitGroup
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 5000; i++ {
 		wg.Add(1)
 		go setItem(c, i, &wg)
+	}
+	for i := 0; i < 5000; i++ {
+		wg.Add(1)
+		go getItem(c, i, &wg)
 	}
 	wg.Wait()
 
@@ -55,6 +60,11 @@ func main() {
 
 func setItem(cache *cache.Cache, i int, wg *sync.WaitGroup) {
 	cache.Set("key"+strconv.Itoa(i), "value"+strconv.Itoa(i))
+	wg.Done()
+}
+
+func getItem(cache *cache.Cache, i int, wg *sync.WaitGroup) {
+	cache.Get("key" + strconv.Itoa(i))
 	wg.Done()
 }
 
