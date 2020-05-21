@@ -82,9 +82,7 @@ func TestCache_GetAndSet(t *testing.T) {
 				},
 				mu: tt.fields.mu,
 			}
-			if _, ok := c.Set(tt.args.Key, tt.want); !ok {
-				t.Errorf("failed to Set() cache with key: %s and value: %s", tt.args.Key, tt.want)
-			}
+			_, ok := c.Set(tt.args.Key, tt.want)
 			got, ok := c.Get(tt.args.Key)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Cache.Get() got = %v, want %v", got, tt.want)
