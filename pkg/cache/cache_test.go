@@ -74,8 +74,8 @@ func TestCache_GetAndSet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Cache{
-				lru: &lru{
+			c := &LRUCache{
+				cache: &cache{
 					cap:   tt.fields.cap,
 					ll:    tt.fields.ll,
 					items: tt.fields.items,
