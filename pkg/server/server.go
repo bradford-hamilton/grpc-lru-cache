@@ -51,6 +51,16 @@ func (c *CacheServer) Flush(context.Context, *pb.Empty) (*pb.Empty, error) {
 	return &pb.Empty{}, nil
 }
 
+// GetKeys retrieves all the available keys from cache
+func (c *CacheServer) GetKeys(context.Context, *pb.Empty) (*pb.KeysRes, error) {
+	keys := c.cache.Keys()
+	strKeys := make([]string, len(keys))
+	for i := range keys {
+		strKeys[i] = keys[i].(string)
+	}
+	return &pb.KeysRes{Keys: strKeys}, nil
+}
+
 func evictionRes(evicted mem.Item) *pb.SetRes {
 	return &pb.SetRes{
 		EvictedItem: &pb.Item{

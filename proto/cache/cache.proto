@@ -5,6 +5,7 @@ package proto.cache;
 service CacheService {
   rpc Get(GetReq) returns (GetRes) {}
   rpc Set(Item) returns (SetRes) {}
+  rpc GetKeys(empty) returns (KeysRes) {}
   rpc Flush(empty) returns (empty) {}
 }
 
@@ -25,6 +26,10 @@ message GetRes {
 message SetRes {
   bool evicted = 1;
   Item evicted_item = 2;
+}
+
+message KeysRes {
+  repeated string keys = 1;
 }
 
 message empty {}
