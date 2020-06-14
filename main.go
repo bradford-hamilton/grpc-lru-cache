@@ -16,9 +16,8 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	cs := server.CacheServer{}
 	grpcServer := grpc.NewServer()
-	pb.RegisterCacheServiceServer(grpcServer, &cs)
+	pb.RegisterCacheServiceServer(grpcServer, &server.CacheServer{})
 
 	grpcServer.Serve(lis)
 }
