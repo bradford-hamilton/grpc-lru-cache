@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO: eventually take these as args
+const cacheSize = 1024
 const port = 21000
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
-	pb.RegisterCacheServiceServer(srv, server.NewCacheServer(1024))
+	pb.RegisterCacheServiceServer(srv, server.NewCacheServer(cacheSize))
 
 	fmt.Printf("Listening on port %d\n", port)
 	srv.Serve(lis)

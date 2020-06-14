@@ -79,3 +79,21 @@ func (l *LRUCache) Len() (length int) {
 	l.mu.Unlock()
 	return
 }
+
+// GetFront gets the Most Recently Used item, and if there
+// are no items in the cache at all, it will return nil
+func (l *LRUCache) GetFront() interface{} {
+	l.mu.Lock()
+	item := l.cache.getFront()
+	l.mu.Unlock()
+	return item
+}
+
+// GetBack gets the Least Recently Used item, and if there
+// are no items in the cache at all, it will return nil
+func (l *LRUCache) GetBack() interface{} {
+	l.mu.Lock()
+	item := l.cache.getBack()
+	l.mu.Unlock()
+	return item
+}

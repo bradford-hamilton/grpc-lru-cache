@@ -84,3 +84,26 @@ func (c *cache) keys() []interface{} {
 	}
 	return keys
 }
+
+// getFront gets the Most Recently Used item, and if there
+// are no items in the cache at all, it will return nil
+func (c *cache) getFront() interface{} {
+	el := c.ll.Front()
+	if el == nil {
+		return nil
+	}
+	return el.Value.(*Item).Value
+}
+
+// getBack gets the Least Recently Used item, and if there are
+// no items in the cache at all, it will return nil. It also
+// moves the back item to the front because it's been accessed.
+func (c *cache) getBack() interface{} {
+	el := c.ll.Back()
+	if el == nil {
+		return nil
+	}
+	// Ensure item gets moved to the front of the cache
+	c.ll.MoveToFront(el)
+	return el.Value.(*Item).Value
+}
