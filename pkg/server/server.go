@@ -45,6 +45,12 @@ func (c *CacheServer) Set(ctx context.Context, item *pb.Item) (*pb.SetRes, error
 	return &pb.SetRes{}, nil
 }
 
+// Flush clears the cache and re-initializes it for use
+func (c *CacheServer) Flush(context.Context, *pb.Empty) (*pb.Empty, error) {
+	c.cache.Flush()
+	return &pb.Empty{}, nil
+}
+
 func evictionRes(evicted mem.Item) *pb.SetRes {
 	return &pb.SetRes{
 		EvictedItem: &pb.Item{
