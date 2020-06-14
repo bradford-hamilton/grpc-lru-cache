@@ -4,6 +4,12 @@ package proto.cache;
 
 service CacheService {
   rpc Get(GetReq) returns (GetRes) {}
+  rpc Set(Item) returns (SetRes) {}
+}
+
+message Item {
+  string key = 1;
+  string value = 2;
 }
 
 message GetReq {
@@ -15,7 +21,7 @@ message GetRes {
   bool cache_hit = 2;
 }
 
-message Item {
-  string key = 1;
-  string value = 2;  
+message SetRes {
+  bool evicted = 1;
+  Item evicted_item = 2;
 }

@@ -16,7 +16,6 @@ func NewCacheServer(size int) *CacheServer {
 	if err != nil {
 		log.Panicf("failed to create new cache, err: %v", err)
 	}
-
 	return &CacheServer{cache: lru}
 }
 
@@ -33,4 +32,25 @@ func (c *CacheServer) Get(ctx context.Context, req *pb.GetReq) (*pb.GetRes, erro
 		return &pb.GetRes{CacheHit: false}, nil
 	}
 	return &pb.GetRes{Value: val.(string), CacheHit: true}, nil
+}
+
+// Set adds the provided item in cache. If an item was evicted because of this call, it will return
+// Evicted == true as well as the the evicted item. If you are only concerned with setting the item
+// in cache and you don't care whether anything was evicted, feel free to ignore both return vars.
+func (c *CacheServer) Set(ctx context.Context, item *pb.Item) (*pb.SetRes, error) {
+	evictedItem, evicted := c.cache.Set(item.Key, item.Value)
+	if evicted {
+		return evictionRes(evictedItem), nil
+	}
+	return &pb.SetRes{}, nil
+}
+
+func evictionRes(evicted mem.Item) *pb.SetRes {
+	return &pb.SetRes{
+		EvictedItem: &pb.Item{
+			Key:   evicted.Key.(string),
+			Value: evicted.Value.(string),
+		},
+		Evicted: true,
+	}
 }
