@@ -5,4 +5,3 @@ I built the cache initially to support any type for both keys and values.. This 
 References:
 - https://github.com/golang/groupcache/blob/master/lru/lru.go
 - https://github.com/hashicorp/golang-lru
-- https://girai.dev/blog/lru-cache-implementation-in-go
