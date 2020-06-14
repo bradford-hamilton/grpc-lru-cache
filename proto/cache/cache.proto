@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto.cache;
+
+service CacheService {
+  rpc Get(GetReq) returns (GetRes) {}
+}
+
+message GetReq {
+  bytes key = 1;
+}
+
+message GetRes {
+  bytes value = 1;
+}
+
+message Item {
+  bytes key = 1;
+  bytes value = 2;
+}
