@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/bradford-hamilton/grpc-lru-cache/pkg/cache"
+	"github.com/bradford-hamilton/grpc-lru-cache/pkg/mem"
 )
 
 func example() {
-	c, err := cache.New(5000)
+	c, err := mem.NewLRUCache(5000)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -58,12 +58,12 @@ func example() {
 	fmt.Println(c.Keys())
 }
 
-func setItem(cache *cache.LRUCache, i int, wg *sync.WaitGroup) {
+func setItem(cache *mem.LRUCache, i int, wg *sync.WaitGroup) {
 	cache.Set("key"+strconv.Itoa(i), "value"+strconv.Itoa(i))
 	wg.Done()
 }
 
-func getItem(cache *cache.LRUCache, i int, wg *sync.WaitGroup) {
+func getItem(cache *mem.LRUCache, i int, wg *sync.WaitGroup) {
 	cache.Get("key" + strconv.Itoa(i))
 	wg.Done()
 }

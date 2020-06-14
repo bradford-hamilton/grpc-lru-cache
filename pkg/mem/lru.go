@@ -1,4 +1,4 @@
-package cache
+package mem
 
 import (
 	"container/list"
@@ -12,8 +12,8 @@ type cache struct {
 
 // Item represents a single item from our LRU cache, which simply has a key and value.
 type Item struct {
-	key   interface{}
-	value interface{}
+	Key   interface{}
+	Value interface{}
 }
 
 // set return values can be ignored if you are not concerned with
@@ -24,7 +24,7 @@ func (c *cache) set(key, value interface{}) (Item, bool) {
 		// Found: move the item to most recently used (front)
 		// position in the list and set the new value for that key
 		c.ll.MoveToFront(el)
-		el.Value.(*Item).value = value
+		el.Value.(*Item).Value = value
 		return Item{}, false
 	}
 
@@ -52,7 +52,7 @@ func (c *cache) get(key interface{}) (interface{}, bool) {
 		// Cache hit: move the element to the front of the list and return
 		// the value as well as true telling the caller it was found
 		c.ll.MoveToFront(el)
-		return el.Value.(*Item).value, true
+		return el.Value.(*Item).Value, true
 	}
 	// Cache miss
 	return nil, false
@@ -63,7 +63,7 @@ func (c *cache) get(key interface{}) (interface{}, bool) {
 func (c *cache) evictElement(el *list.Element) {
 	c.ll.Remove(el)
 	item := el.Value.(*Item)
-	delete(c.items, item.key)
+	delete(c.items, item.Key)
 }
 
 // flush clears the lru's items map and re-initializes the lru's linked list
@@ -79,7 +79,7 @@ func (c *cache) keys() []interface{} {
 	var i int
 	keys := make([]interface{}, len(c.items))
 	for _, item := range c.items {
-		keys[i] = item.Value.(*Item).key
+		keys[i] = item.Value.(*Item).Key
 		i++
 	}
 	return keys

@@ -1,4 +1,4 @@
-package cache
+package mem
 
 import (
 	"container/list"
@@ -16,8 +16,8 @@ type LRUCache struct {
 	mu    sync.Mutex // mutex for concurrent access to the cache
 }
 
-// New creates a new LRUCache with a max size provider by the caller.
-func New(capacity int) (*LRUCache, error) {
+// NewLRUCache creates a new LRUCache with a max size provider by the caller.
+func NewLRUCache(capacity int) (*LRUCache, error) {
 	if capacity < 1 {
 		return nil, ErrMinCacheSize
 	}

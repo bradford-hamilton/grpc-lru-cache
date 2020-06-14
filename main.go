@@ -10,14 +10,17 @@ import (
 	"google.golang.org/grpc"
 )
 
+const port = 21000
+
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 21000))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	pb.RegisterCacheServiceServer(grpcServer, &server.CacheServer{})
+	srv := grpc.NewServer()
+	pb.RegisterCacheServiceServer(srv, server.NewCacheServer(1024))
 
-	grpcServer.Serve(lis)
+	fmt.Printf("Listening on port %d\n", port)
+	srv.Serve(lis)
 }

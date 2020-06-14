@@ -7,14 +7,15 @@ service CacheService {
 }
 
 message GetReq {
-  bytes key = 1;
+  string key = 1;
 }
 
 message GetRes {
-  bytes value = 1;
+  string value = 1;
+  bool cache_hit = 2;
 }
 
 message Item {
-  bytes key = 1;
-  bytes value = 2;
+  string key = 1;
+  string value = 2;  
 }

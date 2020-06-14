@@ -1,4 +1,4 @@
-package cache
+package mem
 
 import (
 	"container/list"
@@ -98,7 +98,7 @@ var sink bool
 var item interface{}
 
 func BenchmarkSetItem(b *testing.B) {
-	c, err := New(1000)
+	c, err := NewLRUCache(1000)
 	if err != nil {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
@@ -110,7 +110,7 @@ func BenchmarkSetItem(b *testing.B) {
 }
 
 func BenchmarkGetItem(b *testing.B) {
-	c, err := New(1000)
+	c, err := NewLRUCache(1000)
 	if err != nil {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
