@@ -9,6 +9,8 @@ service CacheService {
   rpc Flush(empty) returns (empty) {}
   rpc Cap(empty) returns (CapRes) {}
   rpc Len(empty) returns (LenRes) {}
+  rpc GetFirst(empty) returns (GetFirstOrLastRes) {}
+  rpc GetLast(empty) returns (GetFirstOrLastRes) {}
 }
 
 message Item {
@@ -40,6 +42,10 @@ message CapRes {
 
 message LenRes {
   int64 len = 1;
+}
+
+message GetFirstOrLastRes {
+  string value = 1;
 }
 
 message empty {}

@@ -2,11 +2,15 @@ package server
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/bradford-hamilton/grpc-lru-cache/pkg/mem"
 	pb "github.com/bradford-hamilton/grpc-lru-cache/proto/cache"
 )
+
+// ErrEmptyCache is the default error message when asking for the MRU item or LRU item
+var ErrEmptyCache = errors.New("error: cannot retrieve item - cache is empty")
 
 // NewCacheServer creates a new *LRUCache with a caller-provided size, attaches it to a new
 // CacheServer, and returns it to the caller. This allows us to use the LRUCache in only a
@@ -69,6 +73,24 @@ func (c *CacheServer) Cap(context.Context, *pb.Empty) (*pb.CapRes, error) {
 // Len returns the current number of items in the cache
 func (c *CacheServer) Len(context.Context, *pb.Empty) (*pb.LenRes, error) {
 	return &pb.LenRes{Len: int64(c.cache.Len())}, nil
+}
+
+// GetFirst gets the Most Recently Used item and if there are no items in the cache, returns an error
+func (c *CacheServer) GetFirst(context.Context, *pb.Empty) (*pb.GetFirstOrLastRes, error) {
+	val := c.cache.GetFront()
+	if val == nil {
+		return &pb.GetFirstOrLastRes{}, ErrEmptyCache
+	}
+	return &pb.GetFirstOrLastRes{Value: val.(string)}, nil
+}
+
+// GetLast gets the Least Recently Used item and if there are no items in the cache, returns an error
+func (c *CacheServer) GetLast(context.Context, *pb.Empty) (*pb.GetFirstOrLastRes, error) {
+	val := c.cache.GetBack()
+	if val == nil {
+		return &pb.GetFirstOrLastRes{}, ErrEmptyCache
+	}
+	return &pb.GetFirstOrLastRes{Value: val.(string)}, nil
 }
 
 func evictionRes(evicted mem.Item) *pb.SetRes {
