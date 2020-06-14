@@ -8,6 +8,7 @@ service CacheService {
   rpc GetKeys(empty) returns (KeysRes) {}
   rpc Flush(empty) returns (empty) {}
   rpc Cap(empty) returns (CapRes) {}
+  rpc Len(empty) returns (LenRes) {}
 }
 
 message Item {
@@ -35,6 +36,10 @@ message KeysRes {
 
 message CapRes {
   int64 cap = 1;
+}
+
+message LenRes {
+  int64 len = 1;
 }
 
 message empty {}

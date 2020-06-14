@@ -66,6 +66,11 @@ func (c *CacheServer) Cap(context.Context, *pb.Empty) (*pb.CapRes, error) {
 	return &pb.CapRes{Cap: int64(c.cache.Cap())}, nil
 }
 
+// Len returns the current number of items in the cache
+func (c *CacheServer) Len(context.Context, *pb.Empty) (*pb.LenRes, error) {
+	return &pb.LenRes{Len: int64(c.cache.Len())}, nil
+}
+
 func evictionRes(evicted mem.Item) *pb.SetRes {
 	return &pb.SetRes{
 		EvictedItem: &pb.Item{
