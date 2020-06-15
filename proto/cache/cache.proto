@@ -6,12 +6,14 @@ service CacheService {
   rpc Get(GetReq) returns (GetRes) {}
   rpc Set(Item) returns (SetRes) {}
   rpc GetKeys(empty) returns (KeysRes) {}
+  rpc GetFirst(empty) returns (GetFirstOrLastRes) {}
+  rpc GetLast(empty) returns (GetFirstOrLastRes) {}
   rpc Flush(empty) returns (empty) {}
   rpc Cap(empty) returns (CapRes) {}
   rpc Len(empty) returns (LenRes) {}
-  rpc GetFirst(empty) returns (GetFirstOrLastRes) {}
-  rpc GetLast(empty) returns (GetFirstOrLastRes) {}
 }
+
+message empty {}
 
 message Item {
   string key = 1;
@@ -36,6 +38,10 @@ message KeysRes {
   repeated string keys = 1;
 }
 
+message GetFirstOrLastRes {
+  string value = 1;
+}
+
 message CapRes {
   int64 cap = 1;
 }
@@ -43,9 +49,3 @@ message CapRes {
 message LenRes {
   int64 len = 1;
 }
-
-message GetFirstOrLastRes {
-  string value = 1;
-}
-
-message empty {}

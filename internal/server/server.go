@@ -59,22 +59,6 @@ func (c *CacheServer) GetKeys(context.Context, *pb.Empty) (*pb.KeysRes, error) {
 	return &pb.KeysRes{Keys: strKeys}, nil
 }
 
-// Flush clears the cache and re-initializes it for use
-func (c *CacheServer) Flush(context.Context, *pb.Empty) (*pb.Empty, error) {
-	c.cache.Flush()
-	return &pb.Empty{}, nil
-}
-
-// Cap returns the max number of items the cache can hold
-func (c *CacheServer) Cap(context.Context, *pb.Empty) (*pb.CapRes, error) {
-	return &pb.CapRes{Cap: int64(c.cache.Cap())}, nil
-}
-
-// Len returns the current number of items in the cache
-func (c *CacheServer) Len(context.Context, *pb.Empty) (*pb.LenRes, error) {
-	return &pb.LenRes{Len: int64(c.cache.Len())}, nil
-}
-
 // GetFirst gets the Most Recently Used item and if there are no items in the cache, returns an error
 func (c *CacheServer) GetFirst(context.Context, *pb.Empty) (*pb.GetFirstOrLastRes, error) {
 	val := c.cache.GetFront()
@@ -91,6 +75,22 @@ func (c *CacheServer) GetLast(context.Context, *pb.Empty) (*pb.GetFirstOrLastRes
 		return &pb.GetFirstOrLastRes{}, ErrEmptyCache
 	}
 	return &pb.GetFirstOrLastRes{Value: val.(string)}, nil
+}
+
+// Flush clears the cache and re-initializes it for use
+func (c *CacheServer) Flush(context.Context, *pb.Empty) (*pb.Empty, error) {
+	c.cache.Flush()
+	return &pb.Empty{}, nil
+}
+
+// Cap returns the max number of items the cache can hold
+func (c *CacheServer) Cap(context.Context, *pb.Empty) (*pb.CapRes, error) {
+	return &pb.CapRes{Cap: int64(c.cache.Cap())}, nil
+}
+
+// Len returns the current number of items in the cache
+func (c *CacheServer) Len(context.Context, *pb.Empty) (*pb.LenRes, error) {
+	return &pb.LenRes{Len: int64(c.cache.Len())}, nil
 }
 
 func evictionRes(evicted mem.Item) *pb.SetRes {
