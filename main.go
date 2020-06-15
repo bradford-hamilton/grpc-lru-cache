@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/bradford-hamilton/grpc-lru-cache/pkg/server"
+	"github.com/bradford-hamilton/grpc-lru-cache/internal/server"
 	pb "github.com/bradford-hamilton/grpc-lru-cache/proto/cache"
 	"google.golang.org/grpc"
 )
