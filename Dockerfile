@@ -7,6 +7,12 @@ COPY . .
 # Build for linux 64 bit. Omit the symbol table, debug information and the DWARF table for smaller binary, declare static
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags='-s -w -extldflags "-static"' -o /go/bin/server .
 
+# Fetch upx https://github.com/upx/upx
+RUN apk add upx
+
+# Use upx to pack the binary even smaller
+RUN upx /go/bin/server
+
 # From scratch for a super small binary
 FROM scratch
 

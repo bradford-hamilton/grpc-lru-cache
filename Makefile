@@ -7,5 +7,14 @@ proto:
 .PHONY: binsize
 binsize:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags='-s -w -extldflags "-static"' -o serverbin . && \
+	upx serverbin && \
 	stat -f%z serverbin && \
 	rm serverbin
+
+.PHONY: docker-build
+docker-build:
+	docker build -t grpc-lru-cache:latest .
+
+.PHONY: docker-run
+docker-run:
+	docker run -p 21000:21000 grpc-lru-cache
