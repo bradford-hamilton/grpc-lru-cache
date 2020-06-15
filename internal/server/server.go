@@ -12,11 +12,11 @@ import (
 // ErrEmptyCache is the default error message when asking for the MRU item or LRU item
 var ErrEmptyCache = errors.New("error: cannot retrieve item - cache is empty")
 
-// NewCacheServer creates a new *LRUCache with a caller-provided size, attaches it to a new
+// NewCacheServer creates a new *LRUCache with a caller-provided cap, attaches it to a new
 // CacheServer, and returns it to the caller. This allows us to use the LRUCache in only a
 // string -> string capacity, as it normally accpets any type for keys and values.
-func NewCacheServer(size int) *CacheServer {
-	lru, err := mem.NewLRUCache(size)
+func NewCacheServer(cap int) *CacheServer {
+	lru, err := mem.NewLRUCache(cap)
 	if err != nil {
 		log.Panicf("failed to create new cache, err: %v", err)
 	}

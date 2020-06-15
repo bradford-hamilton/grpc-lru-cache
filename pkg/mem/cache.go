@@ -6,8 +6,14 @@ import (
 	"sync"
 )
 
-// ErrMinCacheSize is returned when a caller tries to create a new LRU cache with a capacity of less than one
-var ErrMinCacheSize = errors.New("please provide an LRU cache capacity greater than or equal to 1")
+const maxCacheSize = 1e6
+
+// mem package errors
+var (
+	ErrMinCacheSize     = errors.New("please provide an LRU cache capacity greater than or equal to 1")
+	ErrGrowByAtLeastOne = errors.New("error: you must grow by at at least 1")
+	ErrCacheOverflow    = errors.New("error: call to grow overflows max capacity for cache")
+)
 
 // LRUCache represents an LRU cache and methods attached represent the main public API.
 // LRUCache can be used in concurrent processes, it is thread safe.
@@ -25,7 +31,7 @@ func NewLRUCache(capacity int) (*LRUCache, error) {
 	l.cache = &cache{
 		cap:   capacity,
 		ll:    list.New(),
-		items: make(map[interface{}]*list.Element),
+		items: make(map[interface{}]*list.Element, capacity),
 	}
 	return l, nil
 }
@@ -96,4 +102,21 @@ func (l *LRUCache) GetBack() interface{} {
 	item := l.cache.getBack()
 	l.mu.Unlock()
 	return item
+}
+
+// Grow grows the underlying cache capacity. You must grow by at least 1, and if the
+// new capacity is greater than the maxCacheSize it will return an error
+func (l *LRUCache) Grow(additionalCap int) error {
+	if additionalCap < 1 {
+		return ErrGrowByAtLeastOne
+	}
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	newCap := l.cache.cap + additionalCap
+	if newCap >= maxCacheSize {
+		return ErrCacheOverflow
+	}
+	l.cache.cap = newCap
+	return nil
 }

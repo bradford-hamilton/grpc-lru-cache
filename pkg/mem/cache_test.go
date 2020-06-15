@@ -94,6 +94,91 @@ func TestCache_GetAndSet(t *testing.T) {
 	}
 }
 
+func TestLRUCache_Grow(t *testing.T) {
+	type fields struct {
+		cache *cache
+		mu    sync.Mutex
+	}
+	type args struct {
+		additionalCap int
+	}
+	tests := []struct {
+		name     string
+		fields   fields
+		args     args
+		wantSize int
+		wantErr  bool
+	}{
+		{
+			name: "when called with an additional capacity of < 1, it should error",
+			fields: fields{
+				cache: &cache{
+					cap:   1,
+					ll:    &list.List{},
+					items: map[interface{}]*list.Element{nil: {Value: nil}},
+				},
+				mu: sync.Mutex{},
+			},
+			args:     args{additionalCap: 0},
+			wantSize: 1,
+			wantErr:  true,
+		},
+		{
+			name: "when called with an additional capacity 1, the cache should grow by 1",
+			fields: fields{
+				cache: &cache{
+					cap:   1,
+					ll:    &list.List{},
+					items: map[interface{}]*list.Element{nil: {Value: nil}},
+				},
+				mu: sync.Mutex{},
+			},
+			args:     args{additionalCap: 1},
+			wantSize: 2,
+			wantErr:  false,
+		},
+		{
+			name: "when called with an additional capacity 100, the cache should grow by 100",
+			fields: fields{
+				cache: &cache{
+					cap:   100,
+					ll:    &list.List{},
+					items: map[interface{}]*list.Element{nil: {Value: nil}},
+				},
+				mu: sync.Mutex{},
+			},
+			args:     args{additionalCap: 100},
+			wantSize: 200,
+			wantErr:  false,
+		},
+		{
+			name: "when called with an additional capacity that grows beyond the maxCacheSize, it should error",
+			fields: fields{
+				cache: &cache{
+					cap:   maxCacheSize,
+					ll:    &list.List{},
+					items: map[interface{}]*list.Element{nil: {Value: nil}},
+				},
+				mu: sync.Mutex{},
+			},
+			args:     args{additionalCap: 1},
+			wantSize: 1000000,
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lru := &LRUCache{cache: tt.fields.cache, mu: tt.fields.mu}
+			if err := lru.Grow(tt.args.additionalCap); (err != nil) != tt.wantErr {
+				t.Errorf("LRUCache.Grow() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantSize != lru.cache.cap {
+				t.Errorf("Expected a cache capacity of %d after growing, got: %d", tt.wantSize, lru.cache.cap)
+			}
+		})
+	}
+}
+
 var sink bool
 var item interface{}
 
