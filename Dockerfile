@@ -19,5 +19,8 @@ FROM scratch
 # Copy our static executable
 COPY --from=builder /go/bin/server /go/bin/server
 
+# Expose the grpc port
+EXPOSE 21000
+
 # Run the server binary
 ENTRYPOINT ["/go/bin/server"]
