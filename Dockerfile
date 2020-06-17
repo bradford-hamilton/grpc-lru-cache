@@ -13,7 +13,7 @@ RUN apk add upx
 # Use upx to pack the binary even smaller
 RUN upx /go/bin/server
 
-# From scratch for a super small binary
+# From scratch for the final image
 FROM scratch
 
 # Copy our static executable

@@ -8,7 +8,7 @@ import (
 
 const maxCacheSize = 1e6
 
-// mem package errors
+// available mem package errors
 var (
 	ErrMinCacheSize     = errors.New("please provide an LRU cache capacity greater than or equal to 1")
 	ErrGrowByAtLeastOne = errors.New("error: you must grow by at at least 1")
