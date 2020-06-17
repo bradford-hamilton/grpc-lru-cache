@@ -15,15 +15,19 @@ import (
 
 // TODO: eventually take these as args
 const cacheSize = 1024
-const port = 21000
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "21000"
+	}
+
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	srv, lis := registerGrpcService()
+	srv, lis := registerGrpcService(port)
 
 	go func() {
-		fmt.Printf("Listening on port %d\n", port)
+		fmt.Printf("Listening on port %s\n", port)
 		if err := srv.Serve(lis); err != nil {
 			log.Fatalf("error: %v", err)
 		}
@@ -32,8 +36,8 @@ func main() {
 	<-sigs
 }
 
-func registerGrpcService() (*grpc.Server, net.Listener) {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+func registerGrpcService(port string) (*grpc.Server, net.Listener) {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
