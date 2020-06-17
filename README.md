@@ -19,3 +19,6 @@ Run:
 ```
 make docker-run
 ```
+
+## Easily deploy your own to GCP
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
