@@ -1,6 +1,10 @@
 {
   "name": "grpc-lru-cache",
-  "env": { "PORT": "21000" },
+  "env": {
+    "PORT": {
+      "value": "21000"
+    }
+  },
   "options": {},
   "build": {},
   "hooks": {}
