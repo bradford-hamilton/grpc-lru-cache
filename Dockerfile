@@ -19,10 +19,7 @@ FROM scratch
 # Copy our static executable
 COPY --from=builder /go/bin/server /go/bin/server
 
-# Expose the grpc service's port
-EXPOSE 21000
-
-# Trying this for the one click deploy to GCP button
+# Port choice to play nicely with one click deploy to GCP button
 EXPOSE 8080
 
 # Run the server binary

@@ -19,7 +19,7 @@ const cacheSize = 1024
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "21000"
+		port = "8080"
 	}
 
 	sigs := make(chan os.Signal, 1)
