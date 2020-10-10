@@ -118,5 +118,6 @@ func (l *LRUCache) Grow(additionalCap int) error {
 		return ErrCacheOverflow
 	}
 	l.cache.cap = newCap
+
 	return nil
 }

@@ -19,7 +19,7 @@ const cacheSize = 1024
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "21000"
 	}
 
 	sigs := make(chan os.Signal, 1)
@@ -34,6 +34,8 @@ func main() {
 	}()
 
 	<-sigs
+
+	// TODO: backup to disk
 }
 
 func registerGrpcService(port string) (*grpc.Server, net.Listener) {
@@ -42,6 +44,7 @@ func registerGrpcService(port string) (*grpc.Server, net.Listener) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	srv := grpc.NewServer()
+	// TODO: check if there is content on disk to spin up from first?
 	pb.RegisterCacheServiceServer(srv, server.NewCacheServer(cacheSize))
 	return srv, lis
 }
