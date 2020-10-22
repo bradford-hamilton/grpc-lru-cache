@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -24,7 +25,7 @@ func main() {
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	srv, lis := registerGrpcService(port)
+	srv, lis, cacheSrv := registerGrpcCacheService(port)
 
 	go func() {
 		fmt.Printf("Listening on port %s\n", port)
@@ -35,16 +36,21 @@ func main() {
 
 	<-sigs
 
-	// TODO: backup to disk
+	if err := cacheSrv.SaveToDisk(context.Background()); err != nil {
+		log.Fatalf("error: %v", err)
+	}
 }
 
-func registerGrpcService(port string) (*grpc.Server, net.Listener) {
+func registerGrpcCacheService(port string) (*grpc.Server, net.Listener, *server.CacheServer) {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	srv := grpc.NewServer()
+	cacheServer := server.NewCacheServer(cacheSize)
+
 	// TODO: check if there is content on disk to spin up from first?
-	pb.RegisterCacheServiceServer(srv, server.NewCacheServer(cacheSize))
-	return srv, lis
+	pb.RegisterCacheServiceServer(srv, cacheServer)
+
+	return srv, lis, cacheServer
 }

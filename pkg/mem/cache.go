@@ -121,3 +121,15 @@ func (l *LRUCache) Grow(additionalCap int) error {
 
 	return nil
 }
+
+// SaveToDisk gets run when the system is shutting down. It writes a csv
+// file to ~/.grpc-lru-cache/data.csv with all the key pairs. The system
+// can then boot up the cache server from the CSV.
+func (l *LRUCache) SaveToDisk() error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if err := l.cache.writeToDisk(); err != nil {
+		return err
+	}
+	return nil
+}

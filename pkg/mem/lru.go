@@ -2,6 +2,8 @@ package mem
 
 import (
 	"container/list"
+	"encoding/csv"
+	"os"
 )
 
 type cache struct {
@@ -106,4 +108,77 @@ func (c *cache) getBack() interface{} {
 	// Ensure item gets moved to the front of the cache
 	c.ll.MoveToFront(el)
 	return el.Value.(*Item).Value
+}
+
+// writeToDisk handles find or create for the ~/.grpc-lru-cache directory
+// and find or create for the data.csv file that resides inside. Finally
+// it calls to write the CSV backup data file.
+func (c *cache) writeToDisk() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	if err := createConfigDirIfNotExists(home); err != nil {
+		return err
+	}
+	if err := createConfigFileIfNotExists(home); err != nil {
+		return err
+	}
+	if err := c.writeCSVDataBackup(home); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *cache) writeCSVDataBackup(home string) error {
+	f, err := os.OpenFile(home+"/.grpc-lru-cache/data.csv", os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	w := csv.NewWriter(f)
+
+	for _, val := range c.items {
+		item := val.Value.(*Item)
+		// TODO: when it comes to anything but a string what now? Revisit.
+		err := w.Write([]string{item.Key.(string), item.Value.(string)})
+		if err != nil {
+			return err
+		}
+	}
+
+	w.Flush()
+	if err := w.Error(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func createConfigDirIfNotExists(home string) error {
+	if _, err := os.Stat(home + "/.grpc-lru-cache"); err != nil {
+		if os.IsNotExist(err) {
+			err := os.Mkdir(home+"/.grpc-lru-cache", os.ModePerm)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
+func createConfigFileIfNotExists(home string) error {
+	if _, err := os.Stat(home + "/.grpc-lru-cache/data.csv"); err != nil {
+		if os.IsNotExist(err) {
+			f, err := os.Create(home + "/.grpc-lru-cache/data.csv")
+			if err != nil {
+				return err
+			}
+			f.Close()
+			return nil
+		}
+	}
+	return nil
 }

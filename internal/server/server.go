@@ -83,6 +83,14 @@ func (c *CacheServer) Flush(context.Context, *pb.Empty) (*pb.Empty, error) {
 	return &pb.Empty{}, nil
 }
 
+// SaveToDisk will write all current key pairs to a CSV file in ~/.grpc-lru-cache/data.csv.
+func (c *CacheServer) SaveToDisk(context.Context) error {
+	if err := c.cache.SaveToDisk(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // Cap returns the max number of items the cache can hold
 func (c *CacheServer) Cap(context.Context, *pb.Empty) (*pb.CapRes, error) {
 	return &pb.CapRes{Cap: int64(c.cache.Cap())}, nil
