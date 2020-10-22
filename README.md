@@ -22,3 +22,6 @@ make docker-run
 
 ## Deploy to GCP
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
+## TODO
+- save-to/boot-from disk
