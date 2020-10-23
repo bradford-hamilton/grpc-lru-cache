@@ -3,8 +3,13 @@ package mem
 import (
 	"container/list"
 	"encoding/csv"
+	"errors"
+	"io"
+	"log"
 	"os"
 )
+
+const backupLocation = "/.grpc-lru-cache/data.csv"
 
 type cache struct {
 	cap   int                           // max number of items the cache can hold before needing to evict.
@@ -131,7 +136,7 @@ func (c *cache) writeToDisk() error {
 }
 
 func (c *cache) writeCSVDataBackup(home string) error {
-	f, err := os.OpenFile(home+"/.grpc-lru-cache/data.csv", os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	f, err := os.OpenFile(home+backupLocation, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -155,6 +160,57 @@ func (c *cache) writeCSVDataBackup(home string) error {
 	return nil
 }
 
+func (c *cache) seedBackupDataIfAvailable() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	ok, err := userHasBackupData(home)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return nil
+	}
+
+	csvfile, err := os.Open(home + backupLocation)
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+	r := csv.NewReader(csvfile)
+
+	// Iterate through the records reading each individual record from the CSV file until EOF.
+	for {
+		// Read individual record from csv
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if len(record) != 2 {
+			return errors.New("backup data corrupted, please delete ~/.grpc-lru-cache/data.csv and have it regenerate")
+		}
+		c.set(record[0], record[1])
+	}
+
+	return nil
+}
+
+// userHasBackupData's only concern is returning whether or not there are any bytes written inside /.grpc-lru-cache/data.csv
+func userHasBackupData(home string) (bool, error) {
+	fInfo, err := os.Stat(home + backupLocation)
+	if err != nil {
+		return false, err
+	}
+	if fInfo.Size() == 0 {
+		return false, err
+	}
+	return true, nil
+}
+
 func createConfigDirIfNotExists(home string) error {
 	if _, err := os.Stat(home + "/.grpc-lru-cache"); err != nil {
 		if os.IsNotExist(err) {
@@ -170,9 +226,9 @@ func createConfigDirIfNotExists(home string) error {
 }
 
 func createConfigFileIfNotExists(home string) error {
-	if _, err := os.Stat(home + "/.grpc-lru-cache/data.csv"); err != nil {
+	if _, err := os.Stat(home + backupLocation); err != nil {
 		if os.IsNotExist(err) {
-			f, err := os.Create(home + "/.grpc-lru-cache/data.csv")
+			f, err := os.Create(home + backupLocation)
 			if err != nil {
 				return err
 			}

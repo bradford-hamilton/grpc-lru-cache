@@ -46,11 +46,13 @@ func registerGrpcCacheService(port string) (*grpc.Server, net.Listener, *server.
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	srv := grpc.NewServer()
-	cacheServer := server.NewCacheServer(cacheSize)
+	cacheSrv, err := server.NewCacheServer(cacheSize)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pb.RegisterCacheServiceServer(srv, cacheSrv)
 
-	// TODO: check if there is content on disk to spin up from first?
-	pb.RegisterCacheServiceServer(srv, cacheServer)
-
-	return srv, lis, cacheServer
+	return srv, lis, cacheSrv
 }

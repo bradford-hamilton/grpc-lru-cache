@@ -127,9 +127,22 @@ func (l *LRUCache) Grow(additionalCap int) error {
 // can then boot up the cache server from the CSV.
 func (l *LRUCache) SaveToDisk() error {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	if err := l.cache.writeToDisk(); err != nil {
 		return err
 	}
+	l.mu.Unlock()
+
+	return nil
+}
+
+// SeedBackupDataIfAvailable will check to see if the user has a data.csv
+// and seed the cache with the items if so
+func (l *LRUCache) SeedBackupDataIfAvailable() error {
+	l.mu.Lock()
+	if err := l.cache.seedBackupDataIfAvailable(); err != nil {
+		return err
+	}
+	l.mu.Unlock()
+
 	return nil
 }

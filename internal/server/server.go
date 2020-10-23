@@ -15,12 +15,15 @@ var ErrEmptyCache = errors.New("error: cannot retrieve item - cache is empty")
 // NewCacheServer creates a new *LRUCache with a caller-provided cap, attaches it to a new
 // CacheServer, and returns it to the caller. This allows us to use the LRUCache in only a
 // string -> string capacity, as it normally accpets any type for keys and values.
-func NewCacheServer(cap int) *CacheServer {
+func NewCacheServer(cap int) (*CacheServer, error) {
 	lru, err := mem.NewLRUCache(cap)
 	if err != nil {
 		log.Panicf("failed to create new cache, err: %v", err)
 	}
-	return &CacheServer{cache: lru}
+	if err := lru.SeedBackupDataIfAvailable(); err != nil {
+		return nil, err
+	}
+	return &CacheServer{cache: lru}, nil
 }
 
 // CacheServer implements our CacheService grpc server. It contains an unexported cache
