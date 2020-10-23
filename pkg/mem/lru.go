@@ -12,20 +12,20 @@ import (
 const backupLocation = "/.grpc-lru-cache/data.csv"
 
 type cache struct {
-	cap   int                           // max number of items the cache can hold before needing to evict.
-	ll    *list.List                    // a doubly linked list.
-	items map[interface{}]*list.Element // map of keys -> doubly linked list elements
+	cap   int                      // max number of items the cache can hold before needing to evict.
+	ll    *list.List               // a doubly linked list.
+	items map[string]*list.Element // map of keys -> doubly linked list elements
 }
 
 // Item represents a single item from our LRU cache, which simply has a key and value.
 type Item struct {
-	Key   interface{}
-	Value interface{}
+	Key   string
+	Value string
 }
 
 // set return values can be ignored if you are not concerned with
 // whether an Item was evicted or what that Item was. It can not error.
-func (c *cache) set(key, value interface{}) (Item, bool) {
+func (c *cache) set(key, value string) (Item, bool) {
 	// Check to see if the key is already in cache
 	if el, ok := c.items[key]; ok {
 		// Found: move the item to most recently used (front)
@@ -53,7 +53,7 @@ func (c *cache) set(key, value interface{}) (Item, bool) {
 
 // get looks for the key in cache and returns it if found. The second
 // return value (bool) tells the caller whether an Item was found or not.
-func (c *cache) get(key interface{}) (interface{}, bool) {
+func (c *cache) get(key string) (string, bool) {
 	// Look for the key in cache
 	if el, ok := c.items[key]; ok {
 		// Cache hit: move the element to the front of the list and return
@@ -62,7 +62,7 @@ func (c *cache) get(key interface{}) (interface{}, bool) {
 		return el.Value.(*Item).Value, true
 	}
 	// Cache miss
-	return nil, false
+	return "", false
 }
 
 // evictElement takes a ptr to a list element and removes it from the list.
@@ -82,9 +82,9 @@ func (c *cache) flush() {
 }
 
 // keys returns all current available keys in the cache
-func (c *cache) keys() []interface{} {
+func (c *cache) keys() []string {
 	var i int
-	keys := make([]interface{}, len(c.items))
+	keys := make([]string, len(c.items))
 	for _, item := range c.items {
 		keys[i] = item.Value.(*Item).Key
 		i++
@@ -94,10 +94,10 @@ func (c *cache) keys() []interface{} {
 
 // getFront gets the Most Recently Used item, and if there
 // are no items in the cache at all, it will return nil
-func (c *cache) getFront() interface{} {
+func (c *cache) getFront() string {
 	el := c.ll.Front()
 	if el == nil {
-		return nil
+		return ""
 	}
 	return el.Value.(*Item).Value
 }
@@ -105,10 +105,10 @@ func (c *cache) getFront() interface{} {
 // getBack gets the Least Recently Used item, and if there are
 // no items in the cache at all, it will return nil. It also
 // moves the back item to the front because it's been accessed.
-func (c *cache) getBack() interface{} {
+func (c *cache) getBack() string {
 	el := c.ll.Back()
 	if el == nil {
-		return nil
+		return ""
 	}
 	// Ensure item gets moved to the front of the cache
 	c.ll.MoveToFront(el)
@@ -146,8 +146,7 @@ func (c *cache) writeCSVDataBackup(home string) error {
 
 	for _, val := range c.items {
 		item := val.Value.(*Item)
-		// TODO: when it comes to anything but a string what now? Revisit.
-		err := w.Write([]string{item.Key.(string), item.Value.(string)})
+		err := w.Write([]string{item.Key, item.Value})
 		if err != nil {
 			return err
 		}

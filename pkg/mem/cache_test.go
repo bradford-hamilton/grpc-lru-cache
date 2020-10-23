@@ -13,17 +13,17 @@ func TestCache_GetAndSet(t *testing.T) {
 	type fields struct {
 		cap   int
 		ll    *list.List
-		items map[interface{}]*list.Element
+		items map[string]*list.Element
 		mu    sync.Mutex
 	}
 	type args struct {
-		Key interface{}
+		Key string
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
-		want   interface{}
+		want   string
 		ok     bool
 	}{
 		{
@@ -31,43 +31,10 @@ func TestCache_GetAndSet(t *testing.T) {
 			fields: fields{
 				cap:   10,
 				ll:    list.New(),
-				items: make(map[interface{}]*list.Element),
+				items: make(map[string]*list.Element),
 			},
 			args: args{Key: "someKey"},
 			want: "someValue",
-			ok:   true,
-		},
-		{
-			name: "",
-			fields: fields{
-				cap:   10,
-				ll:    list.New(),
-				items: make(map[interface{}]*list.Element),
-			},
-			args: args{Key: 255},
-			want: 10598,
-			ok:   true,
-		},
-		{
-			name: "",
-			fields: fields{
-				cap:   10,
-				ll:    list.New(),
-				items: make(map[interface{}]*list.Element),
-			},
-			args: args{Key: struct{ name string }{"daaaavid"}},
-			want: struct{ name string }{"daaaavid"},
-			ok:   true,
-		},
-		{
-			name: "",
-			fields: fields{
-				cap:   10,
-				ll:    list.New(),
-				items: make(map[interface{}]*list.Element),
-			},
-			args: args{Key: 0.45},
-			want: 0.45,
 			ok:   true,
 		},
 	}
@@ -115,7 +82,7 @@ func TestLRUCache_Grow(t *testing.T) {
 				cache: &cache{
 					cap:   1,
 					ll:    &list.List{},
-					items: map[interface{}]*list.Element{nil: {Value: nil}},
+					items: map[string]*list.Element{"": {Value: ""}},
 				},
 				mu: sync.Mutex{},
 			},
@@ -129,7 +96,7 @@ func TestLRUCache_Grow(t *testing.T) {
 				cache: &cache{
 					cap:   1,
 					ll:    &list.List{},
-					items: map[interface{}]*list.Element{nil: {Value: nil}},
+					items: map[string]*list.Element{"": {Value: ""}},
 				},
 				mu: sync.Mutex{},
 			},
@@ -143,7 +110,7 @@ func TestLRUCache_Grow(t *testing.T) {
 				cache: &cache{
 					cap:   100,
 					ll:    &list.List{},
-					items: map[interface{}]*list.Element{nil: {Value: nil}},
+					items: map[string]*list.Element{},
 				},
 				mu: sync.Mutex{},
 			},
@@ -157,7 +124,7 @@ func TestLRUCache_Grow(t *testing.T) {
 				cache: &cache{
 					cap:   maxCacheSize,
 					ll:    &list.List{},
-					items: map[interface{}]*list.Element{nil: {Value: nil}},
+					items: map[string]*list.Element{},
 				},
 				mu: sync.Mutex{},
 			},
@@ -180,7 +147,7 @@ func TestLRUCache_Grow(t *testing.T) {
 }
 
 var sink bool
-var item interface{}
+var item string
 
 func BenchmarkSetItem(b *testing.B) {
 	c, err := NewLRUCache(1000)
@@ -189,7 +156,7 @@ func BenchmarkSetItem(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, ok := c.Set(i, "value#"+strconv.Itoa(i))
+		_, ok := c.Set(strconv.Itoa(i), "value#"+strconv.Itoa(i))
 		sink = ok
 	}
 }
@@ -200,7 +167,7 @@ func BenchmarkGetItem(b *testing.B) {
 		fmt.Printf("failed to create client: %v\n", err)
 	}
 	for i := 0; i < 1000; i++ {
-		_, ok := c.Set(i, "value#"+strconv.Itoa(i))
+		_, ok := c.Set(strconv.Itoa(i), "value#"+strconv.Itoa(i))
 		sink = ok
 	}
 	b.ResetTimer()

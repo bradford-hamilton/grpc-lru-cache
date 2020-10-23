@@ -38,7 +38,7 @@ func (c *CacheServer) Get(ctx context.Context, req *pb.GetReq) (*pb.GetRes, erro
 	if !ok {
 		return &pb.GetRes{CacheHit: false}, nil
 	}
-	return &pb.GetRes{Value: val.(string), CacheHit: true}, nil
+	return &pb.GetRes{Value: val, CacheHit: true}, nil
 }
 
 // Set adds the provided item in cache. If an item was evicted because of this call, it will return
@@ -57,7 +57,7 @@ func (c *CacheServer) GetKeys(context.Context, *pb.Empty) (*pb.KeysRes, error) {
 	keys := c.cache.Keys()
 	strKeys := make([]string, len(keys))
 	for i := range keys {
-		strKeys[i] = keys[i].(string)
+		strKeys[i] = keys[i]
 	}
 	return &pb.KeysRes{Keys: strKeys}, nil
 }
@@ -65,19 +65,19 @@ func (c *CacheServer) GetKeys(context.Context, *pb.Empty) (*pb.KeysRes, error) {
 // GetFirst gets the Most Recently Used item and if there are no items in the cache, returns an error
 func (c *CacheServer) GetFirst(context.Context, *pb.Empty) (*pb.GetFirstOrLastRes, error) {
 	val := c.cache.GetFront()
-	if val == nil {
+	if val == "" {
 		return &pb.GetFirstOrLastRes{}, ErrEmptyCache
 	}
-	return &pb.GetFirstOrLastRes{Value: val.(string)}, nil
+	return &pb.GetFirstOrLastRes{Value: val}, nil
 }
 
 // GetLast gets the Least Recently Used item and if there are no items in the cache, returns an error
 func (c *CacheServer) GetLast(context.Context, *pb.Empty) (*pb.GetFirstOrLastRes, error) {
 	val := c.cache.GetBack()
-	if val == nil {
+	if val == "" {
 		return &pb.GetFirstOrLastRes{}, ErrEmptyCache
 	}
-	return &pb.GetFirstOrLastRes{Value: val.(string)}, nil
+	return &pb.GetFirstOrLastRes{Value: val}, nil
 }
 
 // Flush clears the cache and re-initializes it for use
@@ -107,8 +107,8 @@ func (c *CacheServer) Len(context.Context, *pb.Empty) (*pb.LenRes, error) {
 func evictionRes(evicted mem.Item) *pb.SetRes {
 	return &pb.SetRes{
 		EvictedItem: &pb.Item{
-			Key:   evicted.Key.(string),
-			Value: evicted.Value.(string),
+			Key:   evicted.Key,
+			Value: evicted.Value,
 		},
 		Evicted: true,
 	}

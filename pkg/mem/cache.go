@@ -31,7 +31,7 @@ func NewLRUCache(capacity int) (*LRUCache, error) {
 	l.cache = &cache{
 		cap:   capacity,
 		ll:    list.New(),
-		items: make(map[interface{}]*list.Element, capacity),
+		items: make(map[string]*list.Element, capacity),
 	}
 	return l, nil
 }
@@ -39,7 +39,7 @@ func NewLRUCache(capacity int) (*LRUCache, error) {
 // Get handles finding a value by key in the cache. If found, it returns the value
 // as well as true, signifying the cache hit. If no key is found it returns nil
 // and false, signifying the cache miss.
-func (l *LRUCache) Get(key interface{}) (interface{}, bool) {
+func (l *LRUCache) Get(key string) (string, bool) {
 	l.mu.Lock()
 	item, ok := l.cache.get(key)
 	l.mu.Unlock()
@@ -51,7 +51,7 @@ func (l *LRUCache) Get(key interface{}) (interface{}, bool) {
 // an item is evicted, it returns a copy of the item, as well as true to signify that the
 // eviction happened. If nothing is evicted, the return Item will be a zero-value and false
 // is returned to signify no eviction occurred.
-func (l *LRUCache) Set(key, value interface{}) (Item, bool) {
+func (l *LRUCache) Set(key, value string) (Item, bool) {
 	l.mu.Lock()
 	item, ok := l.cache.set(key, value)
 	l.mu.Unlock()
@@ -66,7 +66,7 @@ func (l *LRUCache) Flush() {
 }
 
 // Keys returns a slice of all the current keys available in cache.
-func (l *LRUCache) Keys() []interface{} {
+func (l *LRUCache) Keys() []string {
 	l.mu.Lock()
 	k := l.cache.keys()
 	l.mu.Unlock()
@@ -88,7 +88,7 @@ func (l *LRUCache) Len() (length int) {
 
 // GetFront gets the Most Recently Used item, and if there
 // are no items in the cache at all, it will return nil
-func (l *LRUCache) GetFront() interface{} {
+func (l *LRUCache) GetFront() string {
 	l.mu.Lock()
 	item := l.cache.getFront()
 	l.mu.Unlock()
@@ -97,7 +97,7 @@ func (l *LRUCache) GetFront() interface{} {
 
 // GetBack gets the Least Recently Used item, and if there
 // are no items in the cache at all, it will return nil
-func (l *LRUCache) GetBack() interface{} {
+func (l *LRUCache) GetBack() string {
 	l.mu.Lock()
 	item := l.cache.getBack()
 	l.mu.Unlock()

@@ -18,10 +18,7 @@ func example() {
 	if _, ok := c.Set("someKey", "someValue"); !ok {
 		fmt.Println("didnt add: ", ok)
 	}
-	if _, ok := c.Set("price", 350000); !ok {
-		fmt.Println("didnt add: ", ok)
-	}
-	if _, ok := c.Set(struct{ name string }{"daaaavid"}, 5.5); !ok {
+	if _, ok := c.Set("price", "350000"); !ok {
 		fmt.Println("didnt add: ", ok)
 	}
 
@@ -30,9 +27,6 @@ func example() {
 		fmt.Println(item)
 	}
 	if item, ok := c.Get("price"); ok {
-		fmt.Println(item)
-	}
-	if item, ok := c.Get(struct{ name string }{"daaaavid"}); ok {
 		fmt.Println(item)
 	}
 	if item, ok := c.Get("someKeyThatIsntThere"); ok {
