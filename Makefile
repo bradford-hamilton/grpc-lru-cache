@@ -6,7 +6,7 @@ proto:
 
 .PHONY: binsize
 binsize:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags='-s -w -extldflags "-static"' -o serverbin . && \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o serverbin . && \
 	upx serverbin && \
 	stat -f%z serverbin && \
 	rm serverbin
