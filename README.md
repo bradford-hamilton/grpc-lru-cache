@@ -16,8 +16,5 @@ Run:
 make docker-run
 ```
 
-## Deploy to GCP
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
-
 ## TODO
 - Update save to disk to save the items in the correct order
