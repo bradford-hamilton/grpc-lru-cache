@@ -205,7 +205,7 @@ func userHasBackupData(home string) (bool, error) {
 		return false, err
 	}
 	if fInfo.Size() == 0 {
-		return false, err
+		return false, nil
 	}
 	return true, nil
 }
