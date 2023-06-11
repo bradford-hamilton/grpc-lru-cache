@@ -156,6 +156,7 @@ func (c *cache) writeCSVDataBackup(home string) error {
 	if err := w.Error(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
