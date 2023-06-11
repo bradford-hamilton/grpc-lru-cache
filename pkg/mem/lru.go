@@ -202,6 +202,11 @@ func (c *cache) seedBackupDataIfAvailable() error {
 func userHasBackupData(home string) (bool, error) {
 	fInfo, err := os.Stat(home + backupLocation)
 	if err != nil {
+		if os.IsNotExist(err) {
+			createConfigDirIfNotExists(home)
+			createConfigFileIfNotExists(home)
+			return false, nil
+		}
 		return false, err
 	}
 	if fInfo.Size() == 0 {
