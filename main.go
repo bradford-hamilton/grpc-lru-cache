@@ -15,7 +15,7 @@ import (
 )
 
 // TODO: eventually take these as args
-const cacheSize = 1024
+const cacheSize = 4096
 
 func main() {
 	port := os.Getenv("PORT")

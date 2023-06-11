@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-const maxCacheSize = 1e6
+const maxCacheSize = 65536
 
 // available mem package errors
 var (
