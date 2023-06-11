@@ -7,10 +7,6 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags='-s -w -extldflags "
 RUN apk add upx
 # Use upx to pack the binary even smaller
 RUN upx /go/bin/server
-# From scratch for the final image
-FROM scratch
-# Copy our static executable
-COPY --from=builder /go/bin/server /go/bin/server
 # Expose our GRPC service
 EXPOSE 21000
 # Run the server binary
