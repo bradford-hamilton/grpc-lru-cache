@@ -17,4 +17,5 @@ make docker-run
 ```
 
 ## TODO
+- Share volume between docker <-> machine (maybe update cache location)
 - Update save to disk to save the items in the correct order
