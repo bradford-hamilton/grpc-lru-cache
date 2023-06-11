@@ -1,12 +1,6 @@
-### LRU cache over grpc
-
-Current binary size: 4.5MB.
-
-Main goals:
-- make it fast
-- make it small
-
-### Run with docker
+#### LRU cache over grpc
+---
+#### Running with docker
 Build:
 ```
 make docker-build
@@ -17,5 +11,7 @@ make docker-run
 ```
 
 ## TODO
-- Share volume between docker <-> machine (maybe update cache location)
+- Update volume sharing to be more specific so we're not sharing all of $HOME
+  - Maybe to ~/.grpc-lru-cache dir, but would that then need to be initialized in some way? Come back to this.
+- Host machine needs Docker, Go, and upx
 - Update save to disk to save the items in the correct order

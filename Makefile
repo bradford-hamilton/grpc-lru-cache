@@ -17,4 +17,4 @@ docker-build:
 
 .PHONY: docker-run
 docker-run:
-	docker run -p 21000:21000 grpc-lru-cache
+	docker run -p 21000:21000 -v /$HOME:$HOME grpc-lru-cache
