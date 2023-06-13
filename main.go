@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -14,18 +15,18 @@ import (
 	"google.golang.org/grpc"
 )
 
-// TODO: eventually take these as args
-const cacheSize = 4096
+const (
+	defaultCacheSize = 4096
+	port             = "21000"
+)
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "21000"
-	}
+	size := flag.Int("size", defaultCacheSize, "underlying cache size in bytes")
+	flag.Parse()
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	srv, lis, cacheSrv := registerGrpcCacheService(port)
+	srv, lis, cacheSrv := registerGrpcCacheService(*size)
 
 	go func() {
 		fmt.Printf("Listening on port %s\n", port)
@@ -41,14 +42,14 @@ func main() {
 	}
 }
 
-func registerGrpcCacheService(port string) (*grpc.Server, net.Listener, *server.CacheServer) {
+func registerGrpcCacheService(size int) (*grpc.Server, net.Listener, *server.CacheServer) {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	srv := grpc.NewServer()
-	cacheSrv, err := server.NewCacheServer(cacheSize)
+	cacheSrv, err := server.NewCacheServer(size)
 	if err != nil {
 		log.Fatal(err)
 	}
