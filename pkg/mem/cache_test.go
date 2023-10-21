@@ -14,7 +14,7 @@ func TestCache_GetAndSet(t *testing.T) {
 		cap   int
 		ll    *list.List
 		items map[string]*list.Element
-		mu    sync.Mutex
+		mu    *sync.Mutex
 	}
 	type args struct {
 		Key string
@@ -32,6 +32,7 @@ func TestCache_GetAndSet(t *testing.T) {
 				cap:   10,
 				ll:    list.New(),
 				items: make(map[string]*list.Element),
+				mu:    &sync.Mutex{},
 			},
 			args: args{Key: "someKey"},
 			want: "someValue",
@@ -64,7 +65,7 @@ func TestCache_GetAndSet(t *testing.T) {
 func TestLRUCache_Grow(t *testing.T) {
 	type fields struct {
 		cache *cache
-		mu    sync.Mutex
+		mu    *sync.Mutex
 	}
 	type args struct {
 		additionalCap int
@@ -84,7 +85,7 @@ func TestLRUCache_Grow(t *testing.T) {
 					ll:    &list.List{},
 					items: map[string]*list.Element{"": {Value: ""}},
 				},
-				mu: sync.Mutex{},
+				mu: &sync.Mutex{},
 			},
 			args:     args{additionalCap: 0},
 			wantSize: 1,
@@ -98,7 +99,7 @@ func TestLRUCache_Grow(t *testing.T) {
 					ll:    &list.List{},
 					items: map[string]*list.Element{"": {Value: ""}},
 				},
-				mu: sync.Mutex{},
+				mu: &sync.Mutex{},
 			},
 			args:     args{additionalCap: 1},
 			wantSize: 2,
@@ -112,7 +113,7 @@ func TestLRUCache_Grow(t *testing.T) {
 					ll:    &list.List{},
 					items: map[string]*list.Element{},
 				},
-				mu: sync.Mutex{},
+				mu: &sync.Mutex{},
 			},
 			args:     args{additionalCap: 100},
 			wantSize: 200,
@@ -126,7 +127,7 @@ func TestLRUCache_Grow(t *testing.T) {
 					ll:    &list.List{},
 					items: map[string]*list.Element{},
 				},
-				mu: sync.Mutex{},
+				mu: &sync.Mutex{},
 			},
 			args:     args{additionalCap: 1},
 			wantSize: 1000000,

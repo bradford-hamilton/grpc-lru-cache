@@ -19,7 +19,7 @@ var (
 // LRUCache can be used in concurrent processes, it is thread safe.
 type LRUCache struct {
 	cache *cache
-	mu    sync.Mutex // mutex for concurrent access to the cache
+	mu    *sync.Mutex // mutex for concurrent access to the cache
 }
 
 // NewLRUCache creates a new LRUCache with a max size provider by the caller.
@@ -27,13 +27,15 @@ func NewLRUCache(capacity int) (*LRUCache, error) {
 	if capacity < 1 {
 		return nil, ErrMinCacheSize
 	}
-	l := new(LRUCache)
-	l.cache = &cache{
-		cap:   capacity,
-		ll:    list.New(),
-		items: make(map[string]*list.Element, capacity),
+	l := LRUCache{
+		cache: &cache{
+			cap:   capacity,
+			ll:    list.New(),
+			items: make(map[string]*list.Element, capacity),
+		},
+		mu: &sync.Mutex{},
 	}
-	return l, nil
+	return &l, nil
 }
 
 // Get handles finding a value by key in the cache. If found, it returns the value
