@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: protos/cache-service/cache.proto
 
-package __
+package cache_srv
 
 import (
 	context "context"

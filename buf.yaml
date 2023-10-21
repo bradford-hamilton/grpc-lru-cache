@@ -1,6 +1,7 @@
 version: v1
 name: ""
-deps: []
+deps:
+  - buf.build/googleapis/googleapis
 build:
   excludes: []
 lint:

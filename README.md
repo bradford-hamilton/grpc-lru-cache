@@ -1,5 +1,9 @@
 #### LRU cache over grpc
 ---
+
+#### Dependencies
+- https://github.com/bufbuild/buf
+
 #### Running with docker
 Build:
 ```

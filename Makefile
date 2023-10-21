@@ -1,7 +1,7 @@
 .PHONY: proto docker-build docker-run
 
 proto:
-	bash compile_protos.sh
+	buf generate
 
 docker-build:
 	docker build -t grpc-lru-cache:latest .

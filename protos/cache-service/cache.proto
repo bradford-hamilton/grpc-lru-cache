@@ -2,22 +2,7 @@ syntax = "proto3";
 
 package cache.service;
 
-option go_package = ".";
-
-// import "google/api/annotations.proto";
-
-// import "google/api/annotations.proto";
-// rpc Get(GetReq) returns (GetRes) {
-//   option (google.api.http) = {
-//     get: "/v1/cache/{key}"
-//   };
-// }
-// rpc Set(Item) returns (SetRes) {
-//   option (google.api.http) = {
-//     post: "/v1/cache"
-//     body: "*"
-//   };
-// }
+option go_package = "./cache_srv";
 
 service CacheService {
   rpc Get(GetReq) returns (GetRes) {}
