@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/bradford-hamilton/grpc-lru-cache/pkg/mem"
-	pb "github.com/bradford-hamilton/grpc-lru-cache/proto/cache"
+	pb "github.com/bradford-hamilton/grpc-lru-cache/protos/cache-service"
 )
 
 // ErrEmptyCache is the default error message when asking for the MRU item or LRU item

@@ -1,8 +1,10 @@
 syntax = "proto3";
 
-package proto.cache;
+package cache.service;
 
-option go_package = "/proto/cache;proto_cache";
+option go_package = ".";
+
+// import "google/api/annotations.proto";
 
 // import "google/api/annotations.proto";
 // rpc Get(GetReq) returns (GetRes) {

@@ -12,7 +12,7 @@ import (
 	"syscall"
 
 	"github.com/bradford-hamilton/grpc-lru-cache/internal/server"
-	pb "github.com/bradford-hamilton/grpc-lru-cache/proto/cache"
+	pb "github.com/bradford-hamilton/grpc-lru-cache/protos/cache-service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -44,7 +44,7 @@ func main() {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err := pb.RegisterCacheServiceHandlerFromEndpoint(ctx, mux, "localhost:3000", opts)
+	err := pb.RegisterCacheServiceHandlerFromEndpoint(ctx, mux, "0.0.0.0:3000", opts)
 	if err != nil {
 		log.Fatalf("failed to register cache service http server: %+v", err)
 	}
