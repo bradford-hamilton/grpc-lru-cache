@@ -2,16 +2,12 @@
 ---
 
 #### Dependencies
-- https://github.com/bufbuild/buf
+- https://github.com/bufbuild/buf needed for generating protobufs with make proto (buf generate)
 
-#### Running with docker
+#### Docker
 Build:
 ```
 make docker-build
-```
-Run:
-```
-make docker-run
 ```
 
 ## TODO
