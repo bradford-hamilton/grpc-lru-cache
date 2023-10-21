@@ -130,7 +130,7 @@ func TestLRUCache_Grow(t *testing.T) {
 				mu: &sync.Mutex{},
 			},
 			args:     args{additionalCap: 1},
-			wantSize: 1000000,
+			wantSize: maxCacheSize,
 			wantErr:  true,
 		},
 	}

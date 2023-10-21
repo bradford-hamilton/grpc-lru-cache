@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	defaultCacheSize = 4096
+	defaultCacheSize = 1048576 // 8MB
 	port             = "21000"
 )
 
