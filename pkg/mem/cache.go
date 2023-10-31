@@ -81,11 +81,11 @@ func (l *LRUCache) Cap() int {
 }
 
 // Len returns the current number of items in the cache
-func (l *LRUCache) Len() (length int) {
+func (l *LRUCache) Len() int {
 	l.mu.Lock()
-	length = len(l.cache.items)
+	length := len(l.cache.items)
 	l.mu.Unlock()
-	return
+	return length
 }
 
 // GetFront gets the Most Recently Used item, and if there

@@ -2,7 +2,7 @@ package mem
 
 import (
 	"container/list"
-	"fmt"
+	"log"
 	"reflect"
 	"strconv"
 	"sync"
@@ -153,7 +153,7 @@ var item string
 func BenchmarkSetItem(b *testing.B) {
 	c, err := NewLRUCache(1000)
 	if err != nil {
-		fmt.Printf("failed to create client: %v\n", err)
+		log.Printf("failed to create client: %v\n", err)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -165,7 +165,7 @@ func BenchmarkSetItem(b *testing.B) {
 func BenchmarkGetItem(b *testing.B) {
 	c, err := NewLRUCache(1000)
 	if err != nil {
-		fmt.Printf("failed to create client: %v\n", err)
+		log.Printf("failed to create client: %v\n", err)
 	}
 	for i := 0; i < 1000; i++ {
 		_, ok := c.Set(strconv.Itoa(i), "value#"+strconv.Itoa(i))
