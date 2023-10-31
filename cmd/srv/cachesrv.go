@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	defaultCacheSize = 1048576 // 8MB
+	defaultCacheSize = 1024 * 1024 // 1048576 - 8MB
 	port             = "21000"
 )
 
@@ -35,8 +35,7 @@ func main() {
 		}
 	}()
 
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	<-sigs
