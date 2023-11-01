@@ -8,7 +8,7 @@ import (
 
 const maxCacheSize = 10485760 // 10MB
 
-// available mem package errors
+// Available mem package errors.
 var (
 	ErrMinCacheSize     = errors.New("please provide an LRU cache capacity greater than or equal to 1")
 	ErrGrowByAtLeastOne = errors.New("error: you must grow by at at least 1")
@@ -75,12 +75,12 @@ func (l *LRUCache) Keys() []string {
 	return k
 }
 
-// Cap returns the max number of items the cache can hold
+// Cap returns the max number of items the cache can hold.
 func (l *LRUCache) Cap() int {
 	return l.cache.cap
 }
 
-// Len returns the current number of items in the cache
+// Len returns the current number of items in the cache.
 func (l *LRUCache) Len() int {
 	l.mu.Lock()
 	length := len(l.cache.items)
@@ -89,7 +89,7 @@ func (l *LRUCache) Len() int {
 }
 
 // GetFront gets the Most Recently Used item, and if there
-// are no items in the cache at all, it will return nil
+// are no items in the cache at all, it will return nil.
 func (l *LRUCache) GetFront() string {
 	l.mu.Lock()
 	item := l.cache.getFront()
@@ -98,7 +98,7 @@ func (l *LRUCache) GetFront() string {
 }
 
 // GetBack gets the Least Recently Used item, and if there
-// are no items in the cache at all, it will return nil
+// are no items in the cache at all, it will return nil.
 func (l *LRUCache) GetBack() string {
 	l.mu.Lock()
 	item := l.cache.getBack()
@@ -107,7 +107,7 @@ func (l *LRUCache) GetBack() string {
 }
 
 // Grow grows the underlying cache capacity. You must grow by at least 1, and if the
-// new capacity is greater than the maxCacheSize it will return an error
+// new capacity is greater than the maxCacheSize it will return an error.
 func (l *LRUCache) Grow(additionalCap int) error {
 	if additionalCap < 1 {
 		return ErrGrowByAtLeastOne
@@ -138,7 +138,7 @@ func (l *LRUCache) SaveToDisk() error {
 }
 
 // SeedBackupDataIfAvailable will check to see if the user has a data.csv
-// and seed the cache with the items if so
+// and seed the cache with the items if so.
 func (l *LRUCache) SeedBackupDataIfAvailable() error {
 	l.mu.Lock()
 	if err := l.cache.seedBackupDataIfAvailable(); err != nil {

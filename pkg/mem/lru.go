@@ -5,15 +5,14 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
-	"log"
 	"os"
 )
 
 const backupLocation = "/.grpc-lru-cache/data.csv"
 
 type cache struct {
-	cap   int                      // max number of items the cache can hold before needing to evict.
-	ll    *list.List               // a doubly linked list.
+	cap   int                      // max number of items the cache can hold before needing to evict
+	ll    *list.List               // a doubly linked list
 	items map[string]*list.Element // map of keys -> doubly linked list elements
 }
 
@@ -73,7 +72,7 @@ func (c *cache) evictElement(el *list.Element) {
 	delete(c.items, item.Key)
 }
 
-// flush clears the lru's items map and re-initializes the lru's linked list
+// flush clears the lru's items map and re-initializes the lru's linked list.
 func (c *cache) flush() {
 	for k := range c.items {
 		delete(c.items, k)
@@ -81,7 +80,7 @@ func (c *cache) flush() {
 	c.ll.Init()
 }
 
-// keys returns all current available keys in the cache
+// keys returns all current available keys in the cache.
 func (c *cache) keys() []string {
 	var i int
 	keys := make([]string, len(c.items))
@@ -93,7 +92,7 @@ func (c *cache) keys() []string {
 }
 
 // getFront gets the Most Recently Used item, and if there
-// are no items in the cache at all, it will return nil
+// are no items in the cache at all, it will return nil.
 func (c *cache) getFront() string {
 	el := c.ll.Front()
 	if el == nil {
@@ -166,8 +165,12 @@ func (c *cache) seedBackupDataIfAvailable() error {
 		return err
 	}
 
-	createConfigDirIfNotExists(home)
-	createConfigFileIfNotExists(home)
+	if err := createConfigDirIfNotExists(home); err != nil {
+		return err
+	}
+	if err := createConfigFileIfNotExists(home); err != nil {
+		return err
+	}
 
 	ok, err := userHasBackupData(home)
 	if err != nil {
@@ -179,21 +182,23 @@ func (c *cache) seedBackupDataIfAvailable() error {
 
 	csvfile, err := os.Open(home + backupLocation)
 	if err != nil {
-		log.Fatalln("Couldn't open the csv file", err)
+		return err
 	}
 	r := csv.NewReader(csvfile)
+
+	const validRecordLength = 2
 
 	// Iterate through the records reading each individual record from the CSV file until EOF.
 	for {
 		// Read individual record from csv
 		record, err := r.Read()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {
 			return err
 		}
-		if len(record) != 2 {
+		if len(record) != validRecordLength {
 			return errors.New("backup data corrupted, please delete ~/.grpc-lru-cache/data.csv and have it regenerate")
 		}
 		c.set(record[0], record[1])
@@ -202,7 +207,8 @@ func (c *cache) seedBackupDataIfAvailable() error {
 	return nil
 }
 
-// userHasBackupData's only concern is returning whether or not there are any bytes written inside /.grpc-lru-cache/data.csv
+// userHasBackupData's only concern is returning whether or not
+// there are any bytes written inside /.grpc-lru-cache/data.csv.
 func userHasBackupData(home string) (bool, error) {
 	fInfo, err := os.Stat(home + backupLocation)
 	if err != nil {

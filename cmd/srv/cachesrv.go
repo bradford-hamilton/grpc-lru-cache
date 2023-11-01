@@ -29,9 +29,9 @@ func main() {
 	srv, lis, cacheSrv := registerGrpcCacheService(*size)
 
 	go func() {
-		fmt.Printf("Listening on port %s\n", port)
+		log.Printf("Listening on port %s\n", port)
 		if err := srv.Serve(lis); err != nil {
-			log.Fatalf("error: %v", err)
+			log.Fatalf("error: %v\n", err)
 		}
 	}()
 
@@ -43,14 +43,14 @@ func main() {
 	srv.GracefulStop()
 
 	if err := cacheSrv.SaveToDisk(ctx); err != nil {
-		log.Fatalf("error: %v", err)
+		log.Printf("error: %v\n", err)
 	}
 }
 
 func registerGrpcCacheService(size int) (*grpc.Server, net.Listener, *server.CacheServer) {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatalf("failed to listen: %v\n", err)
 	}
 
 	srv := grpc.NewServer()
