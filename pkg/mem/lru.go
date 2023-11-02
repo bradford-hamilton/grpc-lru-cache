@@ -221,29 +221,45 @@ func userHasBackupData(home string) (bool, error) {
 }
 
 func createConfigDirIfNotExists(home string) error {
-	if _, err := os.Stat(home + "/.grpc-lru-cache"); err != nil {
-		if os.IsNotExist(err) {
-			err := os.Mkdir(home+"/.grpc-lru-cache", os.ModePerm)
-			if err != nil {
-				return err
-			}
-			return nil
-		}
+	_, err := os.Stat(home + "/.grpc-lru-cache")
+	// No errors, the directory already exists
+	if err == nil {
+		return nil
+	}
+
+	// Return ny error besides "file does not exist"
+	if !os.IsNotExist(err) {
 		return err
 	}
+
+	// Directory doesn't exist - create it
+	if err := os.Mkdir(home+"/.grpc-lru-cache", os.ModePerm); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func createConfigFileIfNotExists(home string) error {
-	if _, err := os.Stat(home + backupLocation); err != nil {
-		if os.IsNotExist(err) {
-			f, err := os.Create(home + backupLocation)
-			if err != nil {
-				return err
-			}
-			f.Close()
-			return nil
-		}
+	_, err := os.Stat(home + backupLocation)
+	// No errors, the backup directory and file are present
+	if err == nil {
+		return nil
 	}
+
+	// Return ny error besides "file does not exist"
+	if !os.IsNotExist(err) {
+		return err
+	}
+
+	// File doesn't exist - create it
+	f, err := os.Create(home + backupLocation)
+	if err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+
 	return nil
 }
