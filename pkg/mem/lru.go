@@ -74,9 +74,7 @@ func (c *cache) evictElement(el *list.Element) {
 
 // flush clears the lru's items map and re-initializes the lru's linked list.
 func (c *cache) flush() {
-	for k := range c.items {
-		delete(c.items, k)
-	}
+	clear(c.items)
 	c.ll.Init()
 }
 
