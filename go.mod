@@ -1,6 +1,6 @@
 module github.com/bradford-hamilton/grpc-lru-cache
 
-go 1.21.3
+go 1.21.5
 
 require (
 	google.golang.org/grpc v1.59.0
